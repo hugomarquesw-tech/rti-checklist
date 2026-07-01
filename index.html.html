@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RTI – Inspeção Elétrica NR-10</title>
+<style>
+:root{
+  --azul:#1A3557;--azulm:#2563A8;--azulc:#EBF2FB;
+  --verde:#166534;--verdec:#DCFCE7;
+  --verm:#991B1B;--vermc:#FEF2F2;
+  --amar:#92400E;--amarc:#FEF3C7;
+  --cinza:#6B7280;--cinzac:#F3F4F6;
+  --borda:#D1D5DB;--txt:#111827;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#E8EDF4;color:var(--txt);font-size:15px;}
+
+/* HEADER */
+.hdr{background:var(--azul);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.hdr-logos{display:flex;align-items:center;gap:10px;margin-right:12px;}
+.logo-box{width:44px;height:44px;border-radius:8px;object-fit:contain;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;}
+.logo-box img{width:100%;height:100%;object-fit:contain;}
+.logo-box.empty{border:2px dashed rgba(255,255,255,.4);font-size:9px;color:rgba(255,255,255,.6);text-align:center;padding:3px;cursor:pointer;line-height:1.2;}
+.hdr-txt h1{font-size:1rem;font-weight:700;line-height:1.3;}
+.hdr-txt p{font-size:0.72rem;opacity:.7;margin-top:1px;}
+
+.wrap{max-width:800px;margin:0 auto;padding:16px 12px 80px;}
+
+/* AVISO */
+.aviso{background:#FEF9C3;border:1px solid #FDE047;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:0.82rem;color:#713F12;line-height:1.5;}
+.aviso strong{display:block;margin-bottom:3px;font-size:0.88rem;}
+
+/* CARD */
+.card{background:#fff;border-radius:10px;border:1px solid var(--borda);margin-bottom:16px;overflow:hidden;}
+.chdr{background:var(--azul);color:#fff;padding:10px 14px;font-weight:700;font-size:0.83rem;display:flex;align-items:center;gap:7px;}
+.chdr .bdg{background:rgba(255,255,255,.2);border-radius:4px;padding:2px 8px;font-size:0.68rem;font-weight:600;margin-left:auto;}
+.cbdy{padding:14px;}
+
+/* FORM */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+@media(max-width:500px){.g2{grid-template-columns:1fr;}}
+.sp{grid-column:1/-1;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.lbl{font-size:0.68rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.4px;}
+input[type=text],input[type=date],select,textarea{
+  border:1.5px solid var(--borda);border-radius:6px;
+  padding:9px 11px;font-size:0.88rem;font-family:inherit;
+  color:var(--txt);width:100%;background:#fff;
+  -webkit-appearance:none;appearance:none;
+}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--azulm);box-shadow:0 0 0 3px rgba(37,99,168,.1);}
+textarea{resize:vertical;min-height:60px;}
+
+/* RESP BOX */
+.resp-box{background:var(--azulc);border:1px solid #BFDBFE;border-radius:8px;padding:11px 12px;grid-column:1/-1;}
+.resp-box .lbl{color:var(--azulm);}
+.resp-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;}
+@media(max-width:500px){.resp-row{grid-template-columns:1fr;}}
+
+/* LOGOS CARD */
+.logos-upload{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.logo-slot{border:2px dashed var(--borda);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:border-color .2s;background:var(--cinzac);}
+.logo-slot:hover{border-color:var(--azulm);}
+.logo-slot.preenchido{border-style:solid;border-color:var(--azulm);background:#fff;}
+.logo-slot img{max-height:60px;max-width:100%;margin-bottom:6px;display:block;margin-left:auto;margin-right:auto;}
+.logo-slot span{font-size:0.75rem;color:var(--cinza);font-weight:600;display:block;}
+.logo-slot small{font-size:0.68rem;color:var(--cinza);}
+.logo-slot input[type=file]{display:none;}
+.logo-rm{margin-top:6px;font-size:0.72rem;color:var(--verm);cursor:pointer;font-weight:600;}
+
+/* PROGRESS */
+.prog-wrap{margin-bottom:12px;}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+.bd{border-radius:20px;padding:3px 11px;font-size:0.72rem;font-weight:700;}
+.bd.c{background:var(--verdec);color:var(--verde);}
+.bd.n{background:var(--vermc);color:var(--verm);}
+.bd.a{background:var(--amarc);color:var(--amar);}
+.pbar{height:5px;background:var(--borda);border-radius:3px;margin-top:5px;}
+.pfill{height:100%;background:var(--azulm);border-radius:3px;width:0%;transition:width .3s;}
+
+/* CHECKLIST */
+.clt{width:100%;border-collapse:collapse;font-size:0.82rem;}
+.clt th{background:var(--azulc);color:var(--azul);font-weight:700;padding:7px 8px;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:.4px;}
+.clt td{padding:7px 8px;border-bottom:1px solid var(--cinzac);vertical-align:middle;}
+.clt tr:last-child td{border-bottom:none;}
+
+/* STATUS BUTTONS — pure CSS, no JS class toggle needed for styling */
+.rbg{display:flex;gap:4px;flex-wrap:wrap;}
+.rb{display:inline-flex;align-items:center;gap:4px;cursor:pointer;user-select:none;
+  background:var(--cinzac);border:1.5px solid var(--borda);border-radius:5px;
+  padding:5px 9px;font-size:0.78rem;font-weight:500;transition:all .12s;white-space:nowrap;}
+.rb input{position:absolute;opacity:0;width:0;height:0;}
+.rb:has(input:checked){font-weight:700;}
+.rb.c:has(input:checked){background:var(--verdec);border-color:var(--verde);color:var(--verde);}
+.rb.n:has(input:checked){background:var(--vermc);border-color:var(--verm);color:var(--verm);}
+.rb.a:has(input:checked){background:var(--amarc);border-color:var(--amar);color:var(--amar);}
+/* fallback JS classes */
+.rb.sel-c{background:var(--verdec)!important;border-color:var(--verde)!important;color:var(--verde)!important;font-weight:700!important;}
+.rb.sel-n{background:var(--vermc)!important;border-color:var(--verm)!important;color:var(--verm)!important;font-weight:700!important;}
+.rb.sel-a{background:var(--amarc)!important;border-color:var(--amar)!important;color:var(--amar)!important;font-weight:700!important;}
+
+.obsin{border:1.5px solid var(--borda);border-radius:5px;padding:5px 8px;font-size:0.78rem;width:100%;font-family:inherit;background:#fff;}
+
+/* NC */
+.nci{border:1.5px solid #FECACA;border-left:4px solid var(--verm);border-radius:8px;padding:12px;background:var(--vermc);margin-bottom:10px;}
+.nci h4{color:var(--verm);font-size:0.8rem;font-weight:700;margin-bottom:8px;}
+.ncg{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media(max-width:500px){.ncg{grid-template-columns:1fr;}}
+.ncg .sp{grid-column:1/-1;}
+.ncg .lbl{color:#7F1D1D;}
+.ncg input,.ncg select,.ncg textarea{border-color:#FECACA;font-size:0.82rem;padding:6px 9px;}
+
+/* YN */
+.yni{border:1px solid var(--borda);border-radius:8px;padding:11px 12px;background:var(--cinzac);margin-bottom:8px;}
+.yni p{font-size:0.85rem;margin-bottom:8px;line-height:1.5;}
+.yni p strong{color:var(--azul);}
+.ynopts{display:flex;gap:6px;flex-wrap:wrap;}
+.ynb{display:inline-flex;align-items:center;cursor:pointer;user-select:none;
+  border:1.5px solid var(--borda);border-radius:6px;padding:6px 14px;
+  font-size:0.8rem;font-weight:600;background:#fff;transition:all .12s;}
+.ynb input{position:absolute;opacity:0;width:0;height:0;}
+.ynb:has(input:checked){font-weight:700;}
+.ynb.sim:has(input:checked){background:var(--verdec);border-color:var(--verde);color:var(--verde);}
+.ynb.nao:has(input:checked){background:var(--vermc);border-color:var(--verm);color:var(--verm);}
+.ynb.na2:has(input:checked){background:var(--amarc);border-color:var(--amar);color:var(--amar);}
+/* fallback */
+.ynb.sel-s{background:var(--verdec)!important;border-color:var(--verde)!important;color:var(--verde)!important;}
+.ynb.sel-n{background:var(--vermc)!important;border-color:var(--verm)!important;color:var(--verm)!important;}
+.ynb.sel-a{background:var(--amarc)!important;border-color:var(--amar)!important;color:var(--amar)!important;}
+
+/* FOTOS */
+.fotogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;}
+.fslot{border:2px dashed var(--borda);border-radius:10px;overflow:hidden;background:var(--cinzac);position:relative;}
+.fslot.ok{border:2px solid var(--azulm);background:#fff;}
+.flbl{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:18px 8px;cursor:pointer;text-align:center;gap:4px;min-height:130px;}
+.flbl .ico{font-size:24px;opacity:.4;}
+.flbl b{font-size:0.75rem;color:var(--cinza);font-weight:600;}
+.flbl small{font-size:0.68rem;color:var(--cinza);}
+.fprev{display:none;flex-direction:column;}
+.fprev img{width:100%;height:130px;object-fit:cover;display:block;}
+.fleg{padding:7px 8px;background:#fff;border-top:1px solid var(--borda);}
+.fleg .fn{font-size:0.65rem;font-weight:700;color:var(--azulm);text-transform:uppercase;margin-bottom:3px;}
+.fleg input{font-size:0.77rem;padding:4px 7px;border:1.5px solid var(--borda);border-radius:5px;width:100%;font-family:inherit;background:#fff;}
+.frm{position:absolute;top:5px;right:5px;background:rgba(0,0,0,.55);color:#fff;
+  border:none;border-radius:50%;width:24px;height:24px;font-size:13px;
+  cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2;}
+.fslot.ok .frm{display:flex;}
+
+/* BOTÕES */
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;}
+.btn{border:none;border-radius:8px;padding:13px 18px;font-size:0.92rem;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;gap:7px;flex:1;
+  justify-content:center;transition:opacity .15s;-webkit-tap-highlight-color:transparent;}
+.btn:active{opacity:.8;}
+.btnp{background:var(--azul);color:#fff;}
+.btns{background:#fff;color:var(--azul);border:2px solid var(--azul);}
+
+#preview-box{display:none;background:#fff;border-radius:10px;border:1px solid var(--borda);padding:16px;margin-bottom:16px;}
+#preview-box h2{color:var(--verde);margin-bottom:6px;font-size:0.95rem;}
+#preview-box p{font-size:0.8rem;color:var(--cinza);margin-bottom:12px;line-height:1.5;}
+
+/* ======= PRINT ======= */
+@media print{
+  body{background:#fff!important;}
+  .hdr,.wrap,.aviso,#btn-area,#preview-box{display:none!important;}
+  #parea{display:block!important;}
+  .pbreak{page-break-before:always;}
+  @page{margin:10mm 12mm 12mm 12mm;}
+}
+#parea{display:none;font-family:Arial,sans-serif;font-size:9pt;color:#111;}
+
+/* ── Cabeçalho repetido em todas as páginas via table thead ── */
+@media print {
+  #parea table { width:100%; border-collapse:collapse; }
+  #parea thead { display:table-header-group; }
+  #parea tbody { display:table-row-group; }
+  #parea tfoot { display:table-footer-group; }
+}
+
+/* ── CABEÇALHO (repetido via JS em cada página) ── */
+.pghdr{
+  background:#1A3557;
+  width:100%;
+  margin-bottom:6px;
+}
+.pghdr-inner{
+  display:flex;align-items:center;gap:10px;
+  padding:5px 12px;
+}
+.pghdr .plogo{
+  width:52px;height:52px;
+  object-fit:contain;border-radius:5px;
+  background:#fff;flex-shrink:0;padding:2px;
+}
+.pghdr .pclilogo{
+  width:52px;height:52px;
+  object-fit:contain;border-radius:5px;
+  background:#fff;flex-shrink:0;padding:2px;
+}
+.pghdr-txt{flex:1;text-align:center;}
+.pghdr-txt h1{color:#fff;font-size:10.5pt;font-weight:bold;margin-bottom:3px;letter-spacing:.2px;}
+.pghdr-txt .linha1{color:rgba(255,255,255,.92);font-size:7pt;margin-bottom:1px;}
+.pghdr-txt .linha2{color:rgba(255,255,255,.85);font-size:7pt;}
+.pghdr-faixa{
+  background:#2563A8;
+  padding:2px 12px;
+  color:#fff;font-size:6.5pt;font-weight:bold;
+  text-align:right;
+  letter-spacing:.3px;
+}
+
+/* ── SEÇÕES — azul royal negrito ── */
+.psec{
+  color:#1A3557;
+  font-weight:bold;
+  font-size:9pt;
+  margin-top:10px;
+  margin-bottom:0;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  border-left:4px solid #2563A8;
+  padding:4px 8px;
+  background:#EBF2FB;
+}
+.psec-txt{padding:7px 10px;background:#F9FAFB;border:1px solid #D1D5DB;border-top:none;font-size:8.5pt;line-height:1.6;}
+
+.ptbl{width:100%;border-collapse:collapse;font-size:8pt;}
+.ptbl th{background:#1A3557;color:#fff;font-weight:bold;padding:5px 7px;border:1px solid #D1D5DB;font-size:7.5pt;text-transform:uppercase;}
+.ptbl td{padding:4px 7px;border:1px solid #D1D5DB;vertical-align:top;}
+.ptbl tr:nth-child(even) td{background:#F9FAFB;}
+.pcmp{margin:2px 0;}
+.pcmp strong{color:#6B7280;font-size:7pt;text-transform:uppercase;display:block;}
+.pcmp span{font-size:8.5pt;}
+.pcmps{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:7px 10px;background:#F9FAFB;border:1px solid #E5E7EB;border-top:none;}
+.pcmps-1col{grid-template-columns:1fr;}
+.sc{color:#166534;font-weight:bold;}
+.sn{color:#991B1B;font-weight:bold;}
+.sa{color:#92400E;font-weight:bold;}
+.pnci{border:1px solid #FECACA;border-left:4px solid #991B1B;margin:5px 0;padding:7px 9px;background:#FEF2F2;border-radius:4px;}
+.pnci h4{color:#991B1B;font-size:8pt;font-weight:bold;margin-bottom:3px;}
+.pnci p{font-size:7.5pt;margin:2px 0;}
+.pynr{display:flex;border-bottom:1px solid #E5E7EB;}
+.pynq{flex:1;padding:5px 8px;font-size:8pt;}
+.pyna{width:70px;padding:5px 8px;font-size:8pt;font-weight:bold;text-align:center;border-left:1px solid #E5E7EB;}
+.pfgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 0;}
+.pfi{border:1px solid #D1D5DB;border-radius:4px;overflow:hidden;}
+.pfi img{width:100%;height:160px;object-fit:cover;display:block;}
+.pfic{padding:5px 7px;background:#F9FAFB;}
+.pfic strong{font-size:7pt;color:#6B7280;text-transform:uppercase;display:block;}
+.pfic span{font-size:8pt;}
+/* Assinatura com bastante espaço */
+.passig{margin-top:48px;padding:0 10px;}
+.pline{border-top:1.5px solid #374151;width:260px;padding-top:8px;}
+.pline p{font-size:8.5pt;margin-bottom:3px;}
+.pfoot{margin-top:14px;padding:4px 10px;background:#1A3557;color:#fff;font-size:6.5pt;display:flex;justify-content:space-between;}
+</style>
+</head>
+<body>
+
+<!-- HEADER com logos -->
+<div class="hdr">
+  <div class="hdr-logos">
+    <label class="logo-box empty" id="hlogo-unique-box" title="Clique para adicionar logo Unique">
+      <input type="file" accept="image/*" id="inp-logo-unique" style="display:none">
+      <span id="hlogo-unique-txt" style="font-size:9px;opacity:.8">Logo<br>Empresa</span>
+      <img id="hlogo-unique-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:contain;border-radius:6px;">
+    </label>
+    <div class="hdr-txt">
+      <h1>Relatório Técnico de Inspeção – NR-10</h1>
+      <p>Instalações Elétricas · Unique Consultoria</p>
+    </div>
+    <label class="logo-box empty" id="hlogo-cli-box" title="Clique para adicionar logo do Cliente">
+      <input type="file" accept="image/*" id="inp-logo-cli" style="display:none">
+      <span id="hlogo-cli-txt" style="font-size:9px;opacity:.8">Logo<br>Cliente</span>
+      <img id="hlogo-cli-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:contain;border-radius:6px;">
+    </label>
+  </div>
+</div>
+
+<div class="wrap">
+
+<div class="aviso">
+  <strong>⚠️ Abra este arquivo no Chrome ou Safari — não dentro do Claude</strong>
+  Baixe o arquivo <strong>RTI_Checklist.html</strong>, envie por WhatsApp ou e-mail e abra no navegador do celular. Assim tudo funciona: checklist, fotos da galeria/câmera e geração do PDF.
+</div>
+
+<!-- LOGOS UPLOAD -->
+<div class="card">
+  <div class="chdr">🏷️ Logomarcas do Relatório</div>
+  <div class="cbdy">
+    <p style="font-size:0.78rem;color:var(--cinza);margin-bottom:12px">Adicione as logos que aparecerão no cabeçalho do PDF. Clique em cada área para selecionar.</p>
+    <div class="logos-upload">
+      <div class="logo-slot" id="slot-unique">
+        <label style="cursor:pointer;display:block;">
+          <input type="file" accept="image/*" id="inp2-logo-unique" style="display:none">
+          <img id="prev-logo-unique" src="" alt="" style="display:none;max-height:60px;margin:0 auto 6px;">
+          <span id="txt-logo-unique">🏢 Logo Unique Consultoria</span>
+          <small>Toque para selecionar</small>
+        </label>
+        <div class="logo-rm" id="rm-unique" style="display:none" onclick="remLogo('unique')">✕ Remover</div>
+      </div>
+      <div class="logo-slot" id="slot-cli">
+        <label style="cursor:pointer;display:block;">
+          <input type="file" accept="image/*" id="inp2-logo-cli" style="display:none">
+          <img id="prev-logo-cli" src="" alt="" style="display:none;max-height:60px;margin:0 auto 6px;">
+          <span id="txt-logo-cli">🏭 Logo do Cliente</span>
+          <small>Toque para selecionar</small>
+        </label>
+        <div class="logo-rm" id="rm-cli" style="display:none" onclick="remLogo('cli')">✕ Remover</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IDENTIFICAÇÃO -->
+<div class="card">
+  <div class="chdr">📋 Identificação da Inspeção</div>
+  <div class="cbdy">
+    <div class="g2">
+      <div class="fg sp"><label class="lbl">Empresa / Empregador</label><input id="f_emp" type="text" placeholder="Ex: CODEVASF – 4ª SR"></div>
+      <div class="fg"><label class="lbl">CNPJ</label><input id="f_cnpj" type="text" placeholder="00.000.000/0000-00"></div>
+      <div class="fg"><label class="lbl">Grau de Risco</label>
+        <select id="f_grau"><option value="">Selecione</option><option>1</option><option>2</option><option>3</option><option>4</option></select>
+      </div>
+      <div class="fg"><label class="lbl">Unidade Inspecionada</label><input id="f_unid" type="text" placeholder="Ex: Prédio da 4ª SR"></div>
+      <div class="fg"><label class="lbl">Data da Inspeção</label><input id="f_data" type="date"></div>
+      <div class="fg"><label class="lbl">Revisão</label><input id="f_rev" type="text" value="00"></div>
+      <div class="resp-box">
+        <label class="lbl">👤 Responsável Técnico</label>
+        <input id="f_resp_nome" type="text" value="HUGO LEONARDO MARQUES SANTOS" style="margin-top:6px;font-weight:600;">
+        <div class="resp-row">
+          <input id="f_resp_cargo" type="text" value="TÉCNICO EM SEGURANÇA DO TRABALHO">
+          <input id="f_resp_reg"   type="text" value="MTE 0001177 / CREA 2706878657">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CARACTERIZAÇÃO -->
+<div class="card">
+  <div class="chdr">🏢 Caracterização da Instalação</div>
+  <div class="cbdy">
+    <div class="g2">
+      <div class="fg"><label class="lbl">Tipo de Ocupação</label><input id="f_ocup" type="text" placeholder="Ex: Edifício comercial"></div>
+      <div class="fg"><label class="lbl">Tensão Predominante</label><input id="f_tens" type="text" placeholder="Ex: 127V / 220V"></div>
+      <div class="fg"><label class="lbl">Condições dos Quadros</label><input id="f_quad" type="text" placeholder="Ex: Boas condições"></div>
+      <div class="fg"><label class="lbl">Aterramento Visível?</label>
+        <select id="f_ater"><option value="">Selecione</option><option>Sim</option><option>Não</option></select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKLIST -->
+<div class="card">
+  <div class="chdr">✅ Checklist Técnico <span class="bdg" id="bdg">0 / 20</span></div>
+  <div class="cbdy">
+    <div class="prog-wrap">
+      <div class="badges">
+        <span class="bd c" id="cnt_c">✔ Conforme: 0</span>
+        <span class="bd n" id="cnt_n">✖ NC: 0</span>
+        <span class="bd a" id="cnt_a">– N/A: 0</span>
+      </div>
+      <div class="pbar"><div class="pfill" id="pfill"></div></div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="clt">
+        <thead><tr>
+          <th style="width:38%">Item Avaliado</th>
+          <th style="width:36%">Status</th>
+          <th>Observações</th>
+        </tr></thead>
+        <tbody id="cl-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- NCs -->
+<div class="card" id="card-nc" style="display:none">
+  <div class="chdr" style="background:#7F1D1D">⚠️ Não Conformidades</div>
+  <div class="cbdy" id="nc-body"></div>
+</div>
+
+<!-- SIM/NÃO -->
+<div class="card">
+  <div class="chdr">🔌 Check-List – Segurança em Instalações Elétricas</div>
+  <div class="cbdy" id="yn-body"></div>
+</div>
+
+<!-- FOTOS -->
+<div class="card">
+  <div class="chdr">📷 Registro Fotográfico <span class="bdg" id="fbdg">0 / 5</span></div>
+  <div class="cbdy">
+    <p style="font-size:0.78rem;color:var(--cinza);margin-bottom:12px">Toque no slot para escolher da <strong>galeria</strong> ou tirar foto. Adicione a legenda de cada imagem.</p>
+    <div class="fotogrid" id="fotogrid"></div>
+  </div>
+</div>
+
+<!-- CONCLUSÃO -->
+<div class="card">
+  <div class="chdr">📝 Conclusão</div>
+  <div class="cbdy">
+    <textarea id="f_conc" rows="4" placeholder="Com base na inspeção visual realizada, as condições observadas encontram-se registradas neste relatório..."></textarea>
+  </div>
+</div>
+
+<!-- BOTÕES -->
+<div class="btnrow" id="btn-area">
+  <button class="btn btns" onclick="previa()">👁 Pré-visualizar</button>
+  <button class="btn btnp" onclick="gerarPDF()">📄 Gerar PDF</button>
+</div>
+
+<div id="preview-box">
+  <h2>✅ Relatório montado!</h2>
+  <p>Toque em <strong>Imprimir / Salvar PDF</strong>. No diálogo escolha <em>"Salvar como PDF"</em> ou <em>"AirPrint"</em> no iOS, ou <em>"Salvar como PDF"</em> no Android.</p>
+  <div class="btnrow">
+    <button class="btn btns" onclick="fecharPrevia()">← Editar</button>
+    <button class="btn btnp" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- ÁREA IMPRESSÃO -->
+<div id="parea"></div>
+
+<script>
+// ---- DADOS FIXOS ----
+var RESP_NOME  = 'HUGO LEONARDO MARQUES SANTOS';
+var RESP_CARGO = 'TÉCNICO EM SEGURANÇA DO TRABALHO';
+var RESP_REG   = 'MTE 0001177 / CREA 2706878657';
+
+var CL = [
+  "Quadros identificados","Circuitos identificados","Porta dos quadros íntegra",
+  "Sinalização de perigo elétrico","Barramentos protegidos","Ausência de partes expostas",
+  "Disjuntores identificados","Cabos organizados","Ausência de emendas irregulares",
+  "Tomadas íntegras","Interruptores íntegros","Acesso livre aos quadros",
+  "Proteção contra contatos acidentais","Aterramento aparente","Ausência de extensões improvisadas",
+  "Limpeza dos quadros","Fechamento adequado dos quadros","Identificação de tensão",
+  "Integridade dos eletrodutos","Organização geral da instalação"
+];
+
+var YN = [
+  {id:'q1',t:'O estabelecimento possui subestação de entrada de energia elétrica (cabine primária) para transformação da tensão primária para a secundária?',o:['Sim','Não']},
+  {id:'q2',t:'As instalações elétricas possuem sistema de aterramento de proteção dimensionado e instalado de acordo com a ABNT NBR 5410:2004?',o:['Sim','Não']},
+  {id:'q3',t:'As instalações elétricas possuem DR (dispositivo diferencial-residual) de alta sensibilidade nos circuitos enquadrados pela NBR 5410?',o:['Sim','Não','N/A – Não se aplica']},
+  {id:'q4',t:'Existem condutores elétricos com isolação simples expostos, pendurados ou depositados junto ao chão?',o:['Sim','Não']},
+  {id:'q5',t:'Os interruptores, tomadas, caixas de passagem e seus espelhos/suportes estão em bom estado de conservação, sem partes quebradas?',o:['Sim','Não']},
+  {id:'q6',t:'A organização possui empregados próprios que realizam serviços nas instalações elétricas (inspeção, manutenção, reparo)?',o:['Sim','Não']},
+  {id:'q7',t:'O estabelecimento possui carga instalada superior a 75 kW?',o:['Sim','Não']},
+  {id:'q8',t:'O estabelecimento possui projeto atualizado de suas instalações elétricas?',o:['Sim','Não']},
+];
+
+var clSt = {};   // {0:{s:null,obs:''}, ...}
+var ncSt = {};
+var ynSt = {};
+var fotos = [{d:null,l:''},{d:null,l:''},{d:null,l:''},{d:null,l:''},{d:null,l:''}];
+var logoUnique = null;
+var logoCli    = null;
+
+// ---- LOGOS ----
+function setupLogos() {
+  setupLogoInput('inp-logo-unique', 'unique');
+  setupLogoInput('inp2-logo-unique', 'unique');
+  setupLogoInput('inp-logo-cli', 'cli');
+  setupLogoInput('inp2-logo-cli', 'cli');
+}
+
+function setupLogoInput(inputId, tipo) {
+  var inp = document.getElementById(inputId);
+  if (!inp) return;
+  inp.addEventListener('change', function(e) {
+    var f = e.target.files && e.target.files[0];
+    if (!f) return;
+    var r = new FileReader();
+    r.onload = function(ev) { setLogo(tipo, ev.target.result); };
+    r.readAsDataURL(f);
+  });
+}
+
+function setLogo(tipo, dataUrl) {
+  if (tipo === 'unique') { logoUnique = dataUrl; } else { logoCli = dataUrl; }
+  // header
+  var hImg = document.getElementById('hlogo-'+tipo+'-img');
+  var hTxt = document.getElementById('hlogo-'+tipo+'-txt');
+  if (hImg) { hImg.src = dataUrl; hImg.style.display = 'block'; }
+  if (hTxt) hTxt.style.display = 'none';
+  var hBox = document.getElementById('hlogo-'+tipo+'-box');
+  if (hBox) hBox.classList.remove('empty');
+  // card
+  var pImg = document.getElementById('prev-logo-'+tipo);
+  var pTxt = document.getElementById('txt-logo-'+tipo);
+  var slot = document.getElementById('slot-'+tipo);
+  var rm   = document.getElementById('rm-'+tipo);
+  if (pImg) { pImg.src = dataUrl; pImg.style.display = 'block'; }
+  if (pTxt) pTxt.style.display = 'none';
+  if (slot) slot.classList.add('preenchido');
+  if (rm)   rm.style.display = 'block';
+}
+
+function remLogo(tipo) {
+  if (tipo === 'unique') { logoUnique = null; } else { logoCli = null; }
+  var hImg = document.getElementById('hlogo-'+tipo+'-img');
+  var hTxt = document.getElementById('hlogo-'+tipo+'-txt');
+  if (hImg) { hImg.src=''; hImg.style.display='none'; }
+  if (hTxt) hTxt.style.display = '';
+  var hBox = document.getElementById('hlogo-'+tipo+'-box');
+  if (hBox) hBox.classList.add('empty');
+  var pImg = document.getElementById('prev-logo-'+tipo);
+  var pTxt = document.getElementById('txt-logo-'+tipo);
+  var slot = document.getElementById('slot-'+tipo);
+  var rm   = document.getElementById('rm-'+tipo);
+  if (pImg) { pImg.src=''; pImg.style.display='none'; }
+  if (pTxt) pTxt.style.display = '';
+  if (slot) slot.classList.remove('preenchido');
+  if (rm)   rm.style.display = 'none';
+}
+
+// ---- CHECKLIST ----
+function buildCL() {
+  var tb = document.getElementById('cl-body');
+  for (var i = 0; i < CL.length; i++) {
+    clSt[i] = {s: null, obs: ''};
+    var tr = document.createElement('tr');
+    var tdItem = document.createElement('td');
+    tdItem.textContent = CL[i];
+    var tdSt = document.createElement('td');
+    tdSt.innerHTML = buildRbg(i);
+    var tdObs = document.createElement('td');
+    var inp = document.createElement('input');
+    inp.className = 'obsin'; inp.type = 'text'; inp.placeholder = 'Obs...';
+    inp.setAttribute('data-i', i);
+    inp.addEventListener('input', function(){ clSt[parseInt(this.getAttribute('data-i'))].obs = this.value; });
+    tdObs.appendChild(inp);
+    tr.appendChild(tdItem); tr.appendChild(tdSt); tr.appendChild(tdObs);
+    tb.appendChild(tr);
+  }
+  // attach radio listeners
+  for (var i = 0; i < CL.length; i++) {
+    (function(idx){
+      ['C','N','A'].forEach(function(k){
+        var r = document.getElementById('r'+idx+k);
+        if (r) r.addEventListener('change', function(){ setSt(idx, this.value); });
+      });
+    })(i);
+  }
+}
+
+function buildRbg(i) {
+  return '<div class="rbg">'+
+    '<label class="rb c" id="lbl'+i+'C"><input type="radio" name="cl'+i+'" id="r'+i+'C" value="Conforme"> Conforme</label>'+
+    '<label class="rb n" id="lbl'+i+'N"><input type="radio" name="cl'+i+'" id="r'+i+'N" value="NC"> NC</label>'+
+    '<label class="rb a" id="lbl'+i+'A"><input type="radio" name="cl'+i+'" id="r'+i+'A" value="N/A"> N/A</label>'+
+  '</div>';
+}
+
+function setSt(i, val) {
+  clSt[i].s = val;
+  // fallback visual para navegadores sem :has()
+  ['C','N','A'].forEach(function(k){
+    var lbl = document.getElementById('lbl'+i+k);
+    if (lbl) { lbl.classList.remove('sel-c','sel-n','sel-a'); }
+  });
+  var map = {Conforme:'C', NC:'N', 'N/A':'A'};
+  var clsMap = {Conforme:'sel-c', NC:'sel-n', 'N/A':'sel-a'};
+  var lbl = document.getElementById('lbl'+i+map[val]);
+  if (lbl) lbl.classList.add(clsMap[val]);
+  updateProg();
+  buildNCs();
+}
+
+function updateProg() {
+  var t=CL.length, d=0, c=0, n=0, a=0;
+  for (var i=0;i<t;i++){
+    var s=clSt[i].s;
+    if(s) d++;
+    if(s==='Conforme') c++;
+    if(s==='NC') n++;
+    if(s==='N/A') a++;
+  }
+  document.getElementById('pfill').style.width = Math.round(d/t*100)+'%';
+  document.getElementById('bdg').textContent   = d+' / '+t;
+  document.getElementById('cnt_c').textContent = '✔ Conforme: '+c;
+  document.getElementById('cnt_n').textContent = '✖ NC: '+n;
+  document.getElementById('cnt_a').textContent = '– N/A: '+a;
+}
+
+// ---- NCs ----
+function buildNCs() {
+  var lst = [];
+  for (var i=0;i<CL.length;i++) if(clSt[i].s==='NC') lst.push(i);
+  var card = document.getElementById('card-nc');
+  var body = document.getElementById('nc-body');
+  if (!lst.length) { card.style.display='none'; return; }
+  card.style.display = 'block';
+  body.innerHTML = '';
+  lst.forEach(function(i,j){
+    if (!ncSt[i]) ncSt[i]={local:'',desc:'',fund:'NR-10',risco:'Médio',rec:'',prazo:'30 dias'};
+    var nc = ncSt[i];
+    var d = document.createElement('div');
+    d.className = 'nci';
+    d.innerHTML =
+      '<h4>NC-0'+(j+1)+' — '+CL[i]+'</h4>'+
+      '<div class="ncg">'+
+        '<div class="fg"><label class="lbl">Local</label><input type="text" value="'+x(nc.local)+'" placeholder="Ex: Quadro principal" data-nc="'+i+'" data-f="local"></div>'+
+        '<div class="fg"><label class="lbl">Risco</label><select data-nc="'+i+'" data-f="risco">'+
+          ['Baixo','Médio','Alto','Crítico'].map(function(r){return'<option'+(nc.risco===r?' selected':'')+'>'+r+'</option>';}).join('')+
+        '</select></div>'+
+        '<div class="fg sp"><label class="lbl">Descrição</label><textarea data-nc="'+i+'" data-f="desc" placeholder="Descreva...">'+x(nc.desc)+'</textarea></div>'+
+        '<div class="fg"><label class="lbl">Fundamentação</label><input type="text" value="'+x(nc.fund)+'" data-nc="'+i+'" data-f="fund"></div>'+
+        '<div class="fg"><label class="lbl">Prazo</label><input type="text" value="'+x(nc.prazo)+'" placeholder="Ex: 30 dias" data-nc="'+i+'" data-f="prazo"></div>'+
+        '<div class="fg sp"><label class="lbl">Recomendação</label><input type="text" value="'+x(nc.rec)+'" placeholder="Ação corretiva..." data-nc="'+i+'" data-f="rec"></div>'+
+      '</div>';
+    body.appendChild(d);
+  });
+  body.querySelectorAll('[data-nc]').forEach(function(el){
+    el.addEventListener('input', function(){ ncSt[parseInt(this.dataset.nc)][this.dataset.f] = this.value; });
+    el.addEventListener('change', function(){ ncSt[parseInt(this.dataset.nc)][this.dataset.f] = this.value; });
+  });
+}
+
+function x(s){ return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+// ---- YN ----
+function buildYN() {
+  var body = document.getElementById('yn-body');
+  YN.forEach(function(q, qi){
+    ynSt[q.id] = null;
+    var d = document.createElement('div'); d.className='yni';
+    var opts = q.o.map(function(o, oi){
+      var cls = o==='Sim'?'sim': o==='Não'?'nao':'na2';
+      return '<label class="ynb '+cls+'" id="ynl'+q.id+oi+'">'+
+        '<input type="radio" name="'+q.id+'" value="'+o+'" id="ynr'+q.id+oi+'"> '+o+'</label>';
+    }).join('');
+    d.innerHTML='<p><strong>'+(qi+1)+'.</strong> '+q.t+'</p><div class="ynopts">'+opts+'</div>';
+    body.appendChild(d);
+    q.o.forEach(function(o, oi){
+      var r = document.getElementById('ynr'+q.id+oi);
+      if(r) r.addEventListener('change', function(){ setYN(q.id, q.o, o, oi); });
+    });
+  });
+}
+
+function setYN(id, opts, val, selOi) {
+  ynSt[id] = val;
+  opts.forEach(function(_,oi){
+    var l = document.getElementById('ynl'+id+oi);
+    if(l) { l.classList.remove('sel-s','sel-n','sel-a'); }
+  });
+  var l = document.getElementById('ynl'+id+selOi);
+  if(l) l.classList.add(val==='Sim'?'sel-s': val==='Não'?'sel-n':'sel-a');
+}
+
+// ---- FOTOS ----
+function buildFotos() {
+  var grid = document.getElementById('fotogrid');
+  for (var i = 0; i < 5; i++) {
+    (function(idx){
+      var slot = document.createElement('div');
+      slot.className='fslot'; slot.id='fs'+idx;
+
+      // Label nativo — funciona em iOS/Android sem JS de click
+      var lbl = document.createElement('label');
+      lbl.className='flbl'; lbl.htmlFor='fi'+idx;
+      lbl.innerHTML='<span class="ico">📷</span><b>Foto '+(idx+1)+'</b><small>Galeria ou câmera</small>';
+      slot.appendChild(lbl);
+
+      // Input separado (fora do label p/ evitar double-trigger)
+      var inp = document.createElement('input');
+      inp.type='file'; inp.accept='image/*'; inp.id='fi'+idx;
+      inp.style.cssText='position:absolute;opacity:0;width:0;height:0;';
+      slot.appendChild(inp);
+
+      // Preview
+      var prev = document.createElement('div');
+      prev.className='fprev'; prev.id='fp'+idx;
+      prev.innerHTML='<img id="fimg'+idx+'" src="" alt="">'+
+        '<div class="fleg"><div class="fn">Foto '+(idx+1)+'</div>'+
+        '<input type="text" id="fleg'+idx+'" placeholder="Legenda da foto..."></div>';
+      slot.appendChild(prev);
+
+      // Botão remover
+      var rm = document.createElement('button');
+      rm.className='frm'; rm.textContent='✕'; rm.type='button';
+      rm.addEventListener('click', function(){ remFoto(idx); });
+      slot.appendChild(rm);
+
+      grid.appendChild(slot);
+
+      inp.addEventListener('change', function(e){
+        var f = e.target.files && e.target.files[0];
+        if(!f) return;
+        var r = new FileReader();
+        r.onload = function(ev){
+          fotos[idx].d = ev.target.result;
+          document.getElementById('fimg'+idx).src = ev.target.result;
+          lbl.style.display='none';
+          prev.style.display='flex';
+          slot.classList.add('ok');
+          document.getElementById('fleg'+idx).addEventListener('input', function(){ fotos[idx].l=this.value; });
+          updFBdg();
+        };
+        r.readAsDataURL(f);
+      });
+    })(i);
+  }
+}
+
+function remFoto(idx){
+  fotos[idx].d=null; fotos[idx].l='';
+  document.getElementById('fimg'+idx).src='';
+  document.getElementById('fleg'+idx).value='';
+  document.getElementById('fi'+idx).value='';
+  document.getElementById('fs'+idx).querySelector('.flbl').style.display='';
+  document.getElementById('fp'+idx).style.display='none';
+  document.getElementById('fs'+idx).classList.remove('ok');
+  updFBdg();
+}
+
+function updFBdg(){
+  var n = fotos.filter(function(f){return f.d;}).length;
+  document.getElementById('fbdg').textContent = n+' / 5';
+}
+
+// ---- MONTAR HTML ----
+function cabecalho(dt, rev) {
+  var h = '<div class="pghdr"><div class="pghdr-inner">';
+  if(logoUnique) h+='<img class="plogo" src="'+logoUnique+'" alt="Unique">';
+  else h+='<div style="width:52px;flex-shrink:0"></div>';
+  h+='<div class="pghdr-txt">'+
+    '<h1>RELATÓRIO TÉCNICO DE INSPEÇÃO DAS INSTALAÇÕES ELÉTRICAS</h1>'+
+    '<div class="linha1">Rua Guilhermino Rezende, 451 – Salgado Filho – Aracaju/SE &nbsp;&nbsp;|&nbsp;&nbsp; CNPJ: 27.240.528/0001-94</div>'+
+    '<div class="linha2">E-mail: unique@uniqueconsultoria.net &nbsp;&nbsp;|&nbsp;&nbsp; Telefone: (79) 99678-3734</div>'+
+  '</div>';
+  if(logoCli) h+='<img class="pclilogo" src="'+logoCli+'" alt="Cliente">';
+  else h+='<div style="width:52px;flex-shrink:0"></div>';
+  h+='</div>';
+  h+='<div class="pghdr-faixa">Data: '+dt+' &nbsp;&nbsp;|&nbsp;&nbsp; Revisão: '+rev+'</div>';
+  h+='</div>';
+  return h;
+}
+
+function montarHTML() {
+  var emp   = v('f_emp')||'—', cnpj=v('f_cnpj')||'—', grau=v('f_grau')||'—';
+  var unid  = v('f_unid')||'—', rev=v('f_rev')||'00';
+  var dv    = v('f_data'); var dt = dv ? dv.split('-').reverse().join('/') : '—';
+  var nome  = v('f_resp_nome') ||RESP_NOME;
+  var cargo = v('f_resp_cargo')||RESP_CARGO;
+  var reg   = v('f_resp_reg')  ||RESP_REG;
+  var ocup  = v('f_ocup')||'—', tens=v('f_tens')||'—';
+  var quad  = v('f_quad')||'—', ater=v('f_ater')||'—';
+  var conc  = v('f_conc')||'Com base na inspeção visual realizada, as condições observadas encontram-se registradas neste relatório. As não conformidades identificadas deverão ser tratadas conforme plano de ação, integrando o gerenciamento de riscos ocupacionais da organização.';
+  var ncLst=[]; for(var i=0;i<CL.length;i++) if(clSt[i].s==='NC') ncLst.push(i);
+  var h='';
+
+  // ── 1. IDENTIFICAÇÃO DA EMPRESA ──
+  h+='<div class="psec">1. IDENTIFICAÇÃO DA EMPRESA</div>';
+  h+='<div class="pcmps pcmps-1col">'+cp('Empresa / Empregador',emp)+'</div>';
+  h+='<div class="pcmps">'+
+    cp('CNPJ',cnpj)+cp('Grau de Risco',grau)+
+    cp('Unidade Inspecionada',unid)+cp('Data da Inspeção',dt)+
+    cp('Revisão',rev)+
+    cp('Responsável Técnico',nome)+cp('Cargo',cargo)+cp('Registro',reg)+
+  '</div>';
+
+  // ── 2. CARACTERIZAÇÃO DA INSTALAÇÃO ──
+  h+='<div class="psec">2. CARACTERIZAÇÃO DA INSTALAÇÃO</div>';
+  h+='<div class="pcmps">'+
+    cp('Tipo de Ocupação',ocup)+cp('Tensão Predominante',tens)+
+    cp('Condições dos Quadros',quad)+cp('Aterramento Visível',ater)+
+  '</div>';
+
+  // ── 3. OBJETIVO ──
+  h+='<div class="psec">3. OBJETIVO</div>';
+  h+='<div class="psec-txt">Registrar as condições de segurança observadas nas instalações elétricas por meio de inspeção visual, subsidiando ações corretivas, o PGR e evidências de conformidade com a NR-10.</div>';
+
+  // ── 4. REFERÊNCIAS NORMATIVAS ──
+  h+='<div class="psec">4. REFERÊNCIAS NORMATIVAS</div>';
+  h+='<div class="psec-txt">NR-01, NR-10, NR-26, ABNT NBR 5410 e demais normas aplicáveis.</div>';
+
+  // ── 5. ESCOPO E LIMITAÇÕES ──
+  h+='<div class="psec">5. ESCOPO E LIMITAÇÕES</div>';
+  h+='<div class="psec-txt">Inspeção exclusivamente visual e fotográfica. Não contempla medições, ensaios, termografia, laudos de engenharia ou avaliação da eficiência dos sistemas elétricos.</div>';
+
+  // ── 6. CRITÉRIO DE CLASSIFICAÇÃO DOS RISCOS ──
+  h+='<div class="psec">6. CRITÉRIO DE CLASSIFICAÇÃO DOS RISCOS</div>';
+  h+='<div class="psec-txt">'+
+    '<strong>Baixo:</strong> documental. &nbsp;&nbsp;'+
+    '<strong>Médio:</strong> potencial de acidente sem exposição direta. &nbsp;&nbsp;'+
+    '<strong>Alto:</strong> exposição potencial à eletricidade. &nbsp;&nbsp;'+
+    '<strong>Crítico:</strong> risco iminente de choque ou incêndio.'+
+  '</div>';
+
+  // ── 7. CHECKLIST TÉCNICO DE INSPEÇÃO ──
+  h+='<div class="psec">7. CHECKLIST TÉCNICO DE INSPEÇÃO</div>';
+  h+='<table class="ptbl"><thead><tr>'+
+    '<th style="width:50%">Item Avaliado</th>'+
+    '<th style="width:12%">Conforme</th>'+
+    '<th style="width:8%">NC</th>'+
+    '<th style="width:8%">N/A</th>'+
+    '<th>Observações</th>'+
+  '</tr></thead><tbody>';
+  for(var i=0;i<CL.length;i++){
+    var s=clSt[i].s||'';
+    h+='<tr>'+
+      '<td>'+CL[i]+'</td>'+
+      '<td class="sc" style="text-align:center">'+(s==='Conforme'?'✔':'')+'</td>'+
+      '<td class="sn" style="text-align:center">'+(s==='NC'?'✖':'')+'</td>'+
+      '<td class="sa" style="text-align:center">'+(s==='N/A'?'–':'')+'</td>'+
+      '<td>'+(clSt[i].obs||'')+'</td>'+
+    '</tr>';
+  }
+  h+='</tbody></table>';
+
+  // ── 8. NÃO CONFORMIDADES ──
+  h+='<div class="psec">8. NÃO CONFORMIDADES</div>';
+  if(ncLst.length){
+    ncLst.forEach(function(i,j){
+      var nc=ncSt[i]||{};
+      h+='<div class="pnci">'+
+        '<h4>NC-0'+(j+1)+' — '+CL[i]+'</h4>'+
+        '<p><strong>Local:</strong> '+(nc.local||'—')+' &nbsp;|&nbsp; <strong>Classificação do Risco:</strong> '+(nc.risco||'—')+'</p>'+
+        '<p><strong>Descrição:</strong> '+(nc.desc||'—')+'</p>'+
+        '<p><strong>Fundamentação Normativa:</strong> '+(nc.fund||'NR-10')+'</p>'+
+        '<p><strong>Recomendação:</strong> '+(nc.rec||'—')+' &nbsp;|&nbsp; <strong>Prazo:</strong> '+(nc.prazo||'—')+'</p>'+
+      '</div>';
+    });
+    h+='<div style="margin-top:8px"><table class="ptbl"><thead><tr>'+
+      '<th>NC</th><th>Ação Corretiva</th><th>Fundamento</th><th>Responsável</th><th>Prazo</th><th>Status</th>'+
+    '</tr></thead><tbody>';
+    ncLst.forEach(function(i,j){
+      var nc=ncSt[i]||{};
+      h+='<tr><td>NC-0'+(j+1)+'</td><td>'+(nc.rec||nc.desc||'—')+'</td><td>'+(nc.fund||'NR-10')+'</td><td>'+emp+'</td><td>'+(nc.prazo||'—')+'</td><td>Pendente</td></tr>';
+    });
+    h+='</tbody></table></div>';
+  } else {
+    h+='<div class="psec-txt">Nenhuma não conformidade identificada.</div>';
+  }
+
+  // ── 9. CHECK-LIST – SEGURANÇA ──
+  h+='<div class="psec">9. CHECK-LIST – SEGURANÇA EM INSTALAÇÕES ELÉTRICAS</div>';
+  h+='<div style="border:1px solid #D1D5DB;border-top:none">';
+  YN.forEach(function(q,qi){
+    var ans=ynSt[q.id]||'—';
+    var ac=ans==='Sim'?'sc':ans==='Não'?'sn':ans!=='—'?'sa':'';
+    h+='<div class="pynr"><div class="pynq"><strong>'+(qi+1)+'.</strong> '+q.t+'</div>'+
+      '<div class="pyna '+ac+'">'+ans+'</div></div>';
+  });
+  h+='</div>';
+
+  // ── 10. REGISTRO FOTOGRÁFICO ──
+  var fts=fotos.filter(function(f){return f.d;});
+  h+='<div class="psec">10. REGISTRO FOTOGRÁFICO</div>';
+  if(fts.length){
+    h+='<div class="pfgrid">';
+    fotos.forEach(function(f,fi){
+      if(!f.d) return;
+      h+='<div class="pfi"><img src="'+f.d+'">'+
+        '<div class="pfic"><strong>Foto '+(fi+1)+'</strong><span>'+(f.l||'Sem legenda')+'</span></div></div>';
+    });
+    h+='</div>';
+  } else {
+    h+='<div class="psec-txt">Nenhuma foto registrada.</div>';
+  }
+
+  // ── 11. CONCLUSÃO ──
+  h+='<div class="psec">11. CONCLUSÃO</div>';
+  h+='<div class="psec-txt">'+conc+'</div>';
+
+  // ── 12. RESPONSABILIDADE TÉCNICA ──
+  h+='<div class="psec">12. RESPONSABILIDADE TÉCNICA</div>';
+  h+='<div class="psec-txt">Este relatório representa exclusivamente as condições visualmente observadas na data da inspeção.</div>';
+  h+='<div class="passig">'+
+    '<div class="pline">'+
+      '<p><strong>'+nome+'</strong></p>'+
+      '<p>'+cargo+'</p>'+
+      '<p>'+reg+'</p>'+
+    '</div>'+
+  '</div>';
+
+  // RODAPÉ
+  h+='<div class="pfoot">'+
+    '<span>Unique Consultoria · unique@uniqueconsultoria.net · (79) 99678-3734</span>'+
+    '<span>Data: '+dt+' · Rev: '+rev+'</span>'+
+  '</div>';
+
+  return h;
+}
+
+function cp(l,v){ return '<div class="pcmp"><strong>'+l+'</strong><span>'+v+'</span></div>'; }
+function v(id){ var el=document.getElementById(id); return el?el.value.trim():'';}
+
+// Injeta cabeçalho em todas as páginas via afterprint trick
+function injetarCabecalhoEmPaginas(dt, rev) {
+  // Estratégia: divide o conteúdo em blocos por page-break e insere cabeçalho no topo de cada um
+  // Como o browser controla quebras, usamos uma abordagem CSS:
+  // Cada seção principal vira um bloco com o cabeçalho embutido, visível apenas na impressão
+  var pa = document.getElementById('parea');
+  var hdrHtml = cabecalho(dt, rev);
+  // Adiciona cabeçalho repetido antes de seções que normalmente cairiam em nova página
+  var breaks = pa.querySelectorAll('.pbreak');
+  breaks.forEach(function(el){
+    var hdrDiv = document.createElement('div');
+    hdrDiv.innerHTML = hdrHtml;
+    el.parentNode.insertBefore(hdrDiv, el);
+  });
+}
+
+// ---- AÇÕES ----
+function previa(){
+  var dv = v('f_data'); var dt = dv ? dv.split('-').reverse().join('/') : '—';
+  var rev = v('f_rev')||'00';
+  var pa=document.getElementById('parea');
+  pa.innerHTML = cabecalho(dt,rev) + montarHTML();
+  pa.style.display='block';
+  document.getElementById('preview-box').style.display='block';
+  document.getElementById('btn-area').style.display='none';
+  document.getElementById('preview-box').scrollIntoView({behavior:'smooth'});
+}
+
+function fecharPrevia(){
+  document.getElementById('parea').style.display='none';
+  document.getElementById('preview-box').style.display='none';
+  document.getElementById('btn-area').style.display='flex';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function gerarPDF(){
+  var dv = v('f_data'); var dt = dv ? dv.split('-').reverse().join('/') : '—';
+  var rev = v('f_rev')||'00';
+  var hdrHtml = cabecalho(dt, rev);
+  var bodyHtml = montarHTML();
+
+  // Monta o conteúdo completo com cabeçalho no início
+  // Para repetir em todas as páginas: usa a técnica de tabela com thead fixo via CSS print
+  var pa = document.getElementById('parea');
+  pa.innerHTML =
+    // Wrapper de tabela para repetir cabeçalho em todas as páginas
+    '<table style="width:100%;border-collapse:collapse;">' +
+      '<thead><tr><td style="padding:0">' +
+        hdrHtml +
+      '</td></tr></thead>' +
+      '<tbody><tr><td style="padding:0;vertical-align:top">' +
+        bodyHtml +
+      '</td></tr></tbody>' +
+    '</table>';
+
+  pa.style.display='block';
+  setTimeout(function(){
+    window.print();
+    setTimeout(function(){ pa.style.display='none'; }, 1500);
+  }, 300);
+}
+
+// ---- INIT ----
+setupLogos();
+buildCL();
+buildYN();
+buildFotos();
+</script>
+</body>
+</html>
